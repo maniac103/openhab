@@ -9,9 +9,6 @@
 package org.openhab.io.cv.internal.listeners;
 
 import java.util.List;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -19,18 +16,14 @@ import org.atmosphere.cpr.AtmosphereResource;
 import org.atmosphere.cpr.BroadcastFilter.BroadcastAction.ACTION;
 import org.atmosphere.cpr.PerRequestBroadcastFilter;
 import org.openhab.core.items.GenericItem;
-import org.openhab.core.items.GroupItem;
 import org.openhab.core.items.Item;
 import org.openhab.core.items.StateChangeListener;
 import org.openhab.core.types.State;
 import org.openhab.io.cv.internal.broadcaster.CometVisuBroadcaster;
 import org.openhab.io.cv.internal.cache.CVBroadcasterCache;
-import org.openhab.io.cv.internal.filter.DuplicateBroadcastProtectionFilter;
 import org.openhab.io.cv.internal.filter.ResponseObjectFilter;
 import org.openhab.io.cv.internal.resources.ReadResource;
 import org.openhab.io.cv.internal.resources.beans.ItemStateListBean;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 /**
@@ -43,10 +36,6 @@ import org.slf4j.LoggerFactory;
  */
 abstract public class ResourceStateChangeListener {
 
-	private static final Logger logger = LoggerFactory.getLogger(ResourceStateChangeListener.class);
-	final static ConcurrentMap<String, Object> map = new ConcurrentHashMap<String, Object>();
-
-	private Set<String> relevantItems = null;
 	private StateChangeListener stateChangeListener;
 	private CometVisuBroadcaster broadcaster;
 
@@ -65,10 +54,6 @@ abstract public class ResourceStateChangeListener {
 		this.broadcaster = broadcaster;
 	}
 	
-	public static ConcurrentMap<String, Object> getMap() {
-		return map;
-	}
-	
 	public void registerItems(){
 		broadcaster.getBroadcasterConfig().setBroadcasterCache(new CVBroadcasterCache());
 		broadcaster.getBroadcasterConfig().getBroadcasterCache().configure(broadcaster.getBroadcasterConfig());
@@ -77,12 +62,13 @@ abstract public class ResourceStateChangeListener {
 		broadcaster.getBroadcasterConfig().addFilter(new PerRequestBroadcastFilter() {
 			
 			@Override
-			public BroadcastAction filter(Object originalMessage, Object message) {
-				return new BroadcastAction(ACTION.CONTINUE,  message);
+			public BroadcastAction filter(String broadcasterId, Object originalMessage, Object message) {
+				return new BroadcastAction(message);
 			}
 
 			@Override
-			public BroadcastAction filter(AtmosphereResource resource, Object originalMessage, Object message) {
+			public BroadcastAction filter(String broadcasterId, AtmosphereResource resource, 
+					Object originalMessage, Object message) {
 				 HttpServletRequest request = resource.getRequest();
 				 Object responseObject;
 				 if (message instanceof Item) {
@@ -100,7 +86,6 @@ abstract public class ResourceStateChangeListener {
 			}
 		});
 		
-		broadcaster.getBroadcasterConfig().addFilter(new DuplicateBroadcastProtectionFilter());
 		broadcaster.getBroadcasterConfig().addFilter(new ResponseObjectFilter());
 		
 		
@@ -108,18 +93,7 @@ abstract public class ResourceStateChangeListener {
 		stateChangeListener = new StateChangeListener() {
 			// don't react on update events
             public void stateUpdated(Item item, State state) {
-                    // if the group has a base item and thus might calculate its state
-                    // as a DecimalType or other, we also consider it to be necessary to
-                    // send an update to the client as the label of the item might have changed,
-                    // even though its state is yet the same.
-                    if(item instanceof GroupItem) {
-                            GroupItem gItem = (GroupItem) item;
-                            if(gItem.getBaseItem()!=null) {
-                                    if(!broadcaster.getAtmosphereResources().isEmpty()) {
-                                            broadcaster.broadcast(item);
-                                    }
-                            }
-                    }
+               //updates can be ignored                    
             }
 
 			
@@ -143,11 +117,8 @@ abstract public class ResourceStateChangeListener {
 	}
 
 	protected void unregisterStateChangeListenerOnRelevantItems() {
-		
-		if(relevantItems!=null) {
-			for(String itemName : relevantItems) {
-				unregisterChangeListenerOnItem(stateChangeListener, itemName);
-			}
+		for(String itemName : getRelevantItemNames()) {
+			unregisterChangeListenerOnItem(stateChangeListener, itemName);
 		}
 	}
 
