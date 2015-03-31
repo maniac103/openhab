@@ -1,3 +1,11 @@
+/**
+ * Copyright (c) 2010-2015, openHAB.org and others.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ */
 package org.openhab.binding.lacrosse.connector;
 
 import gnu.io.CommPortIdentifier;
@@ -21,25 +29,36 @@ import org.openhab.binding.lacrosse.LaCrosseBinding;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * The connector to communicate with the JeeNode/Arduino+RFM12 device via
+ * serial connection.
+ * 
+ * @author Christian Sowada
+ * @since 1.7.0
+ */
 public class LaCrosseConnector {
 
 	private static final Logger logger = LoggerFactory
 			.getLogger(LaCrosseConnector.class);
 
 	private BufferedReader input;
-	
+
 	private SerialPort serialPort;
-	
+
 	private String port;
 
 	private Map<String, NumberAverage> avarage = new HashMap<String, NumberAverage>();
 
 	private LaCrosseBinding binding;
-	
+
+	/**
+	 * Constructor
+	 * @param binding
+	 */
 	public LaCrosseConnector(LaCrosseBinding binding) {
 		this.binding = binding;
 	}
-	
+
 	/**
 	 * Is serial connection open
 	 * @return
@@ -60,11 +79,9 @@ public class LaCrosseConnector {
 	/**
 	 * Open and initialize a serial port.
 	 * 
-	 * @param portName
-	 *            e.g. /dev/ttyS0
-	 * @param listener
-	 *            the listener which is informed after a successful response
-	 *            read
+	 * @param portName e.g. /dev/ttyS0
+	 * @param listener the listener which is informed after a
+	 * successful response read
 	 * @throws InitializationException
 	 */
 	public void open(String portName)  {
@@ -116,8 +133,8 @@ public class LaCrosseConnector {
 										int c = Integer.parseInt(parts[1]);
 
 										int battery_new = (c & 0x80) >> 7;
-//										int type = (c & 0x70) >> 7;
-//										int channel = c & 0x0F;
+										// int type = (c & 0x70) >> 7;
+										// int channel = c & 0x0F;
 
 										float temperature = (float)(Integer.parseInt(parts[2]) * 256 + Integer.parseInt(parts[3]) - 1000) / 10;
 										int humidity = Integer.parseInt(parts[4]) & 0x7f;
@@ -125,18 +142,18 @@ public class LaCrosseConnector {
 
 										boolean batteryLow = battery_low == 1;
 										boolean batteryNew = battery_new == 1;
-										
+
 										BigDecimal temp = getAverage(addr + ".temp", 15, 2).
 												add(BigDecimal.valueOf(temperature));
-										
+
 										BigDecimal hum = getAverage(addr + ".hum", 15, 1).
 												add(BigDecimal.valueOf(humidity));
-										
+
 										onDataReceived(addr, temp, hum, batteryNew, batteryLow);
 									}
 								}
 							} catch (Exception e) {
-								logger.error("ui", e);
+								logger.error("LaCrosse error", e);
 							}
 						}
 					}
@@ -178,19 +195,6 @@ public class LaCrosseConnector {
 		}
 	}
 
-	/*
-	 * 										int addr = Integer.parseInt(parts[0]);
-										int c = Integer.parseInt(parts[1]);
-
-										int battery_new = (c & 0x80) >> 7;
-										int type = (c & 0x70) >> 7;
-										int channel = c & 0x0F;
-
-										float temperature = (float)(Integer.parseInt(parts[2]) * 256 + Integer.parseInt(parts[3]) - 1000) / 10;
-										int humidity = Integer.parseInt(parts[4]) & 0x7f;
-										int battery_low = (Integer.parseInt(parts[4]) & 0x80) >> 7;
-	 */
-
 	/**
 	 * @param key
 	 * @param size
@@ -201,16 +205,17 @@ public class LaCrosseConnector {
 		if(!avarage.containsKey(key)) {
 			avarage.put(key, new NumberAverage(3, scale));
 		}
-		
+
 		return avarage.get(key);
 	}
-	
+
 	/**
-	 * @param address
-	 * @param temperature
-	 * @param humidity
-	 * @param batteryNew
-	 * @param batteryWeak
+	 * Called if a valid data received from a sensor.
+	 * @param address The address of sensor
+	 * @param temperature The temperature in celsius
+	 * @param humidity The relative humidity
+	 * @param batteryNew A flag if the sensor has a new battery
+	 * @param batteryWeak A flag if the sensor has a weak battery
 	 */
 	public void onDataReceived(int address, BigDecimal temperature, BigDecimal humidity, boolean batteryNew, boolean batteryWeak) {
 		binding.postSensorData(address, temperature, humidity, batteryNew, batteryWeak);

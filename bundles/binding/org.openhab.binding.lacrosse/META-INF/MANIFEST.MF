@@ -5,7 +5,10 @@ Bundle-SymbolicName: org.openhab.binding.lacrosse;singleton:=true
 Bundle-Version: 1.7.0.qualifier
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
-Import-Package: org.apache.commons.lang,
+Import-Package: gnu.io,
+ org.apache.commons.lang,
+ org.codehaus.jackson;version="1.9.2",
+ org.codehaus.jackson.map;version="1.9.2",
  org.openhab.config.core,
  org.openhab.core.binding,
  org.openhab.core.events,
@@ -16,7 +19,4 @@ Import-Package: org.apache.commons.lang,
  org.osgi.framework,
  org.osgi.service.cm,
  org.slf4j
-Require-Bundle: org.openhab.io.transport.serial;bundle-version="1.5.0",
- org.openhab.io.rest.lib
 Service-Component: OSGI-INF/lacrossebinding.xml, OSGI-INF/genericbindingprovider.xml
-Export-Package: org.openhab.binding.lacrosse

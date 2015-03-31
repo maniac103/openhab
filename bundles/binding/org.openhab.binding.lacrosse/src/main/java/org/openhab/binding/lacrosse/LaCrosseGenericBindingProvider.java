@@ -1,3 +1,11 @@
+/**
+* Copyright (c) 2010-2015, openHAB.org and others.
+*
+* All rights reserved. This program and the accompanying materials
+* are made available under the terms of the Eclipse Public License v1.0
+* which accompanies this distribution, and is available at
+* http://www.eclipse.org/legal/epl-v10.html
+*/
 package org.openhab.binding.lacrosse;
 
 import java.util.Map.Entry;
@@ -9,6 +17,13 @@ import org.openhab.model.item.binding.BindingConfigParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * This class can parse information from the binding format and provides 
+ * LaCrosse binding informations.
+ * 
+ * @author Christian Sowada
+ * @since 1.7.0
+ */
 public class LaCrosseGenericBindingProvider extends
 		AbstractGenericBindingProvider implements LaCrosseBindingProvider {
 
@@ -92,9 +107,6 @@ public class LaCrosseGenericBindingProvider extends
 	class LaCrosseBindingConfig implements BindingConfig {
 		public String id;
 		public String type;
-		public LaCrosseBindingConfig() {
-
-		}
 	}
 	
 }

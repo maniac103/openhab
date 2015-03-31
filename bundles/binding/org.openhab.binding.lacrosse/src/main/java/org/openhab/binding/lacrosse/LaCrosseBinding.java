@@ -1,3 +1,11 @@
+/**
+* Copyright (c) 2010-2015, openHAB.org and others.
+*
+* All rights reserved. This program and the accompanying materials
+* are made available under the terms of the Eclipse Public License v1.0
+* which accompanies this distribution, and is available at
+* http://www.eclipse.org/legal/epl-v10.html
+*/
 package org.openhab.binding.lacrosse;
 
 import java.io.File;
@@ -20,22 +28,33 @@ import org.openhab.config.core.ConfigDispatcher;
 import org.openhab.core.binding.AbstractBinding;
 import org.openhab.core.library.types.DecimalType;
 import org.openhab.core.library.types.OnOffType;
-import org.openhab.core.types.Command;
 import org.openhab.core.types.State;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * LaCrosse binding implementation.
+ * 
+ * @author Christian Sowada
+ * @since 1.7.0
+ */
 public class LaCrosseBinding extends AbstractBinding<LaCrosseBindingProvider> implements ManagedService {
 
 	private static final Logger logger = LoggerFactory
 			.getLogger(LaCrosseBinding.class);
 	
+	/** Connector to communicate with the JeeLink */
 	private LaCrosseConnector connector;
 	
+	/** 
+	 * List of all mappings between initial id
+	 * and new random id (battery change)
+	 * */
 	private HashMap<Integer, Integer> addressMapping;
 	
+	/** Last telegram received times */
 	private HashMap<Integer, Long> lastSensorUpdate;
 
 	private long mappingModeTimer;
@@ -44,17 +63,15 @@ public class LaCrosseBinding extends AbstractBinding<LaCrosseBindingProvider> im
 		NONE, AUTO, BY_ACTION
 	}
 	
+	/** Set battery change mode to auto */
 	private MappingMode automaticMappingMode = MappingMode.AUTO;
 	
+	/**
+	 * Constructor
+	 */
 	public LaCrosseBinding() {
 		addressMapping = new HashMap<Integer, Integer>();
 		lastSensorUpdate = 	new HashMap<Integer, Long>();
-	}
-
-	@Override
-	public void receiveCommand(String itemName, Command command) {
-		//TODO: Add set timer command for BY_ACTION mode
-		super.receiveCommand(itemName, command);
 	}
 
 	@Override
@@ -73,6 +90,13 @@ public class LaCrosseBinding extends AbstractBinding<LaCrosseBindingProvider> im
 		}
 	}
 
+	/**
+	 * Send new data to openHAB event bus
+	 * 
+	 * @param id
+	 * @param type
+	 * @param newState
+	 */
 	public void postUpdate(String id, String type, State newState) {
 		for (LaCrosseBindingProvider provider : providers) {
 			String itemName = provider.getItemName(id + "." + type);
@@ -82,6 +106,16 @@ public class LaCrosseBinding extends AbstractBinding<LaCrosseBindingProvider> im
 		}
 	}
 
+	/**
+	 * Send new LaCrosse data to openHAB event bus. Normally called
+	 * by connector.
+	 * 
+	 * @param address The address of sensor
+	 * @param temperature The temperature in celsius
+	 * @param humidity The relative humidity
+	 * @param batteryNew A flag if the sensor has a new battery
+	 * @param batteryWeak A flag if the sensor has a weak battery
+	 */
 	public void postSensorData(int address, BigDecimal temperature, 
 			BigDecimal humidity, boolean batteryNew, boolean batteryWeak) {
 		
@@ -107,6 +141,7 @@ public class LaCrosseBinding extends AbstractBinding<LaCrosseBindingProvider> im
 			}
 		}
 		
+		// check if the sensor id is known
 		if(found) {
 			logger.debug("Receive sensor data for: " + addr);
 			
@@ -203,7 +238,7 @@ public class LaCrosseBinding extends AbstractBinding<LaCrosseBindingProvider> im
 	}
 	
 	/**
-	 * Returns the mapping file
+	 * Returns the mapping file from disk
 	 * @return
 	 */
 	private File getMappingFile() {
