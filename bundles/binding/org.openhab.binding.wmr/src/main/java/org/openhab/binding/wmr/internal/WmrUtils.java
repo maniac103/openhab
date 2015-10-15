@@ -126,7 +126,7 @@ public class WmrUtils {
 		WIND_DIR[] values = WmrConstants.WIND_DIR.values();
 		
 		String windDirectionStr = (String) (windTmpDir < values.length ? 
-				values[windTmpDir] : "Unknown value");
+				values[windTmpDir].name() : "Unknown value");
 
 		// wind chill
 		int chillSign = toInt(data[8]) / 16;	
