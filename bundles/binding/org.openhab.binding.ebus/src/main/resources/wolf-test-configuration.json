@@ -190,6 +190,7 @@
     {
         "comment":  "[??] <Brenner?> Kromschröder/Wolf: Regler - Es werden Daten gesendet, die Antworten ist unverändert. Uninteressant ?",
         "filter":   "?? 50 50 14 .*",
+        "class":	"test",
         "debug":    2,
         
         "values": {

@@ -64,11 +64,25 @@ public class EBusJsonConfTool {
 
 			Map<String, Map<String, ?>> valueEntries = new HashMap<String, Map<String,?>>();
 
+//			if(entry.containsKey("id")) {
+//				List<String> command = new ArrayList<String>();
+//				m.add(command);
+//				
+//				command.add((String )entry.get("class")); 
+//				command.add(entry.containsKey("id") ? (String )entry.get("id") : "-"); 
+//				command.add("*");
+//				command.add("*");
+//				command.add((String )entry.get("comment"));
+//			}
+
+			
 			Map<String, Map<String, ?>> x =  (Map<String, Map<String, ?>>)entry.get("values");
 			if(x != null && !x.isEmpty()) {
 				valueEntries.putAll(x);
 			}
 
+			boolean singleValue = x!= null ? x.size() == 1 : false;
+			
 			x =  (Map<String, Map<String, ?>>)entry.get("computed_values");
 			if(x != null && !x.isEmpty()) {
 				valueEntries.putAll(x);
@@ -81,10 +95,26 @@ public class EBusJsonConfTool {
 					List<String> line = new ArrayList<String>();
 					m.add(line);
 
-					line.add(valueKey);
+					if(entry.containsKey("class") && entry.containsKey("id")) {
+						if(singleValue) {
+							line.add((String) entry.get("class") + "." + (String) entry.get("id"));
+						} else {
+							line.add((String) entry.get("class") + "." + (String) entry.get("id") + "." + valueKey);
+						}
+					} else if(entry.containsKey("class") ) {
+							line.add((String) entry.get("class") + "." + valueKey);
+						
+					} else {
+						line.add(valueKey);
+					}
 					
-					line.add((String) entry.get("class"));
-					line.add(StringUtils.defaultIfEmpty((String) entry.get("id"), "-"));
+					if(!StringUtils.isEmpty((String) entry.get("id"))) {
+						line.add((String) entry.get("class") + "." + (String) entry.get("id"));
+					} else {
+						line.add("---");
+					}
+					//line.add((String) entry.get("class"));
+					//line.add(StringUtils.defaultIfEmpty((String) entry.get("id"), "-"));
 
 					String t = (String) map.get("type");
 					if(map.containsKey("type_hint")) {
@@ -135,7 +165,7 @@ public class EBusJsonConfTool {
 		// Add headers
 		ArrayList<String> arrayList = new ArrayList<String>();
 		arrayList.add("ID");
-		arrayList.add("Class");
+		//arrayList.add("Class");
 		arrayList.add("Command");
 		arrayList.add("Item type");
 		arrayList.add("Description");

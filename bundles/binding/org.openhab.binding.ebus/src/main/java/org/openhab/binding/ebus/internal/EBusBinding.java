@@ -345,6 +345,8 @@ public class EBusBinding extends AbstractBinding<EBusBindingProvider> implements
 		
 		for (Entry<String, Object> entry : results.entrySet()) {
 
+			logger.debug("->" + entry.getKey());
+			
 			State state = StateUtils.convertToState(entry.getValue());
 
 			// process if the state is set

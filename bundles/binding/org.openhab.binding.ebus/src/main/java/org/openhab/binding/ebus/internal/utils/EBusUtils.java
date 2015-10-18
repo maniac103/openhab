@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
  * @since 1.7.0
  */
 public class EBusUtils {
-
+	
 	private static final Logger logger = LoggerFactory
 			.getLogger(EBusUtils.class);
 

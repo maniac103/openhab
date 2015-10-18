@@ -96,17 +96,21 @@ public class EBusCommandProcessor implements BindingChangeListener {
 			final Runnable r = new Runnable() {
 				@Override
 				public void run() {
-					byte[] data = composeSendData(
-							eBusProvider, itemName, null);
+					try {
+						byte[] data = composeSendData(
+								eBusProvider, itemName, null);
 
-					if(data != null && data.length > 0) {
-						if(connector == null) {
-							logger.warn("eBus connector not ready, can't send data yet!");
+						if(data != null && data.length > 0) {
+							if(connector == null) {
+								logger.warn("eBus connector not ready, can't send data yet!");
+							} else {
+								connector.addToSendQueue(data);
+							}
 						} else {
-							connector.addToSendQueue(data);
+							logger.warn("No data to send for item {}! Check your item configuration.", itemName);
 						}
-					} else {
-						logger.warn("No data to send for item {}! Check your item configuration.", itemName);
+					} catch (Exception e) {
+						logger.error("Error while running runnable ...", e);
 					}
 				}
 			};
@@ -151,8 +155,7 @@ public class EBusCommandProcessor implements BindingChangeListener {
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	public byte[] composeEBusTelegram(String commandId, String commandClass,
-			Byte dst, Byte src, Map<String, Object> values) {
+	public byte[] composeEBusTelegram(String commandId,	Byte dst, Byte src, Map<String, Object> values) {
 
 		if(configurationProvider == null || configurationProvider.isEmpty()) {
 			logger.debug("eBUS configuration provider not ready, can't get send data yet.");
@@ -161,7 +164,7 @@ public class EBusCommandProcessor implements BindingChangeListener {
 
 		byte[] buffer = null;
 
-		Map<String, Object> commandCfg = configurationProvider.getCommandById(commandId, commandClass);
+		Map<String, Object> commandCfg = configurationProvider.getCommandById(commandId);
 		if(commandCfg != null) {
 
 			if(dst == null && commandCfg.containsKey("dst")) {
@@ -172,7 +175,7 @@ public class EBusCommandProcessor implements BindingChangeListener {
 				logger.error("Unable to send command, destination adress is missing. Set \"dst\" in item.cfg ...");
 				return null;
 			}
-			
+
 			byte[] bytesData = EBusUtils.toByteArray((String) commandCfg.get("data"));
 			byte[] bytesCmd = EBusUtils.toByteArray((String) commandCfg.get("command"));
 
@@ -181,7 +184,7 @@ public class EBusCommandProcessor implements BindingChangeListener {
 			buffer[1] = dst;
 			buffer[4] = (byte) bytesData.length;
 			System.arraycopy(bytesCmd, 0, buffer, 2, bytesCmd.length);
-			
+
 			if(values == null || values.isEmpty()) {
 				logger.trace("No setter-values for eBUS telegram, used default data ...");
 				System.arraycopy(bytesData, 0, buffer, 5, bytesData.length);
@@ -194,14 +197,14 @@ public class EBusCommandProcessor implements BindingChangeListener {
 				logger.warn("No values configurated in json cfg ...");
 				return null;
 			}
-			
+
 			for (Entry<String, Object> entry : values.entrySet()) {
 
 				Map<String, Object> valueEntry = (Map<String, Object>) valuesConfig.get(entry.getKey());
 
 				if(valueEntry == null) {
 					logger.warn("Unable to set value key \"{}\" in command \"{}.{}\", can't compose telegram ...", 
-							entry.getKey(), commandId, commandClass);
+							entry.getKey(), commandId);
 					return null;
 				}
 
@@ -212,15 +215,15 @@ public class EBusCommandProcessor implements BindingChangeListener {
 				BigDecimal factor = NumberUtils.toBigDecimal(valueEntry.get("factor"));
 				BigDecimal min = NumberUtils.toBigDecimal(valueEntry.get("min"));
 				BigDecimal max = NumberUtils.toBigDecimal(valueEntry.get("max"));
-				
+
 				if(max != null && value.compareTo(max) == 1) {
 					throw new RuntimeException("Value larger than allowed!");
 				}
-				
+
 				if(min != null && value.compareTo(min) == -1) {
 					throw new RuntimeException("Value smaller than allowed!");
 				}
-				
+
 				if(value != null && factor != null) {
 					value = value.divide(factor);
 				}
@@ -237,25 +240,25 @@ public class EBusCommandProcessor implements BindingChangeListener {
 			}
 
 			for (Entry<String, Map<String, Object>> value : valuesConfig.entrySet()) {
-				
+
 				// check if the special value type for kromschöder/wolf crc is availabel
 				if(value.getValue().get("type").equals("crc-kw")) {
-					
+
 					byte b = 0;
 					int pos = (Integer)value.getValue().get("pos")-6;
-					
+
 					for (int i = 0; i < bytesData.length; i++) {
 						// exclude crc pos
 						if(i != pos) {
 							b = EBusUtils.crc8(bytesData[i], b, (byte)0x5C);
 						}
 					}
-					
+
 					// set crc to specified position
 					bytesData[pos] = b;
 				}
 			}
-			
+
 			bytesData = EBusUtils.encodeEBusData(bytesData);
 			System.arraycopy(bytesData, 0, buffer, 5, bytesData.length);
 
@@ -280,35 +283,55 @@ public class EBusCommandProcessor implements BindingChangeListener {
 
 		byte[] data = null;
 
-		String setValue = provider.getSet(itemName);
 		String cmd = provider.getCommand(itemName);
-		String cmdClass = provider.getCommandClass(itemName);
-
-		String type = command != null ? command.toString().toLowerCase() : null;
-
 		Byte dst = provider.getTelegramDestination(itemName);
 		Byte src = provider.getTelegramSource(itemName);
 
 		HashMap<String, Object> values = null;
 
+		
+		if(StringUtils.isEmpty(cmd)) {
+			// use id instead
+			String id = provider.getId(itemName);
+			if(!StringUtils.isEmpty(id)) {
+				String[] split = StringUtils.split(id, ".");
+				
+				if(split.length > 1) {
+					cmd = split[0] + "." + split[1];
+				}
+			}
+		}
+		
 		if(src == null) {
 			src = connector.getSenderId();
 		}
 
-		// try to convert command to a supported value
-		if(StringUtils.isNotEmpty(setValue)) {
+		if(command == null) {
+			// polling
+			data = composeEBusTelegram(cmd, dst, src, values);
+
+		} else {
+			String setValue = provider.getSet(itemName);
+			int index = StringUtils.lastIndexOf(setValue, ".");
+			String cmdId = StringUtils.left(setValue, index);
+			String valueName = StringUtils.substring(setValue, index+1);
+
+			// try to convert command to a supported value
 			Object value = StateUtils.convertFromState(command);
 			if(value != null) {
 				values = new HashMap<String, Object>();
-				values.put(setValue, value);
+				values.put(valueName, value);
 			}
+
+			data = composeEBusTelegram(cmdId, dst, src, values);
 		}
 
-		data = composeEBusTelegram(cmd, cmdClass, dst, src, values);
-
 		// first try, data-ON, data-OFF, etc.
-		if(data == null && StringUtils.isNotEmpty(type)) {
-			data = provider.getTelegramData(itemName, type);
+		if(data == null) {
+			String type = command != null ? command.toString().toLowerCase() : null;
+			if(StringUtils.isNotEmpty(type)) {
+				data = provider.getTelegramData(itemName, type);
+			}
 		}
 
 		if(data == null) {

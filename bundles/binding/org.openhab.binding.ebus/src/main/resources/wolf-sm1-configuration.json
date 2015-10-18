@@ -2,7 +2,7 @@
     {
         "comment":  "<Solar> Cylinder temperature (°C)",
         "device":   "Wolf CSZ-2 > SM1, FW: 10/2014",
-        "id":       "temp_boiler",
+        "id":       "temp_cylinder",
         "class":    "solar",
         "command":  "50 22",
         "data":     "(32) 29 0A",

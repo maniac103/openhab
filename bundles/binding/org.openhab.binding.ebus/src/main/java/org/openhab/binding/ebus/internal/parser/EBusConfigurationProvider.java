@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * The configuration provider reads the vendors specific ebus protocol
- * infomation from the json configuration files. All placeholders (regex)
+ * information from the json configuration files. All placeholders (regex)
  * and javascript snippets will be compiled after loading to improve
  * runtime performance.
  * 
@@ -137,7 +137,6 @@ public class EBusConfigurationProvider {
 		}
 	}
 
-
 	/**
 	 * @param configurationEntry
 	 */
@@ -169,7 +168,7 @@ public class EBusConfigurationProvider {
 				filter += " " + matcher.replaceAll("[0-9A-Z]{2}");
 			}
 
-			// Finally add .* to end with everthing
+			// Finally add .* to end with everything
 			filter += " .*";
 
 			logger.trace("Compile RegEx filter: {}", filter);
@@ -248,10 +247,19 @@ public class EBusConfigurationProvider {
 	/**
 	 * Return all configurations by command id and class
 	 * @param commandId The command id
-	 * @param commandClass The command class
 	 * @return All matching configurations
 	 */
-	public Map<String, Object> getCommandById(String commandId, String commandClass) {
+	public Map<String, Object> getCommandById(String commandId) {
+		
+		String[] idElements = StringUtils.split(commandId, ".");
+		String commandClass = null;
+		commandId = null;
+		
+		if(idElements.length > 1) {
+			commandClass = idElements[0];
+			commandId = idElements[1];
+		}
+		
 		for (Map<String, Object> entry : telegramRegistry) {
 			if(entry.containsKey("id") && entry.get("id").equals(commandId) && 
 					entry.containsKey("class") && entry.get("class").equals(commandClass)) {

@@ -38,13 +38,6 @@ public interface EBusBindingProvider extends BindingProvider {
 	public String getId(String itemName);
 
 	/**
-	 * Return the configurated class for this item or null if not set
-	 * @param itemName The openhab item name
-	 * @return The value or null
-	 */
-	public String getCommandClass(String itemName);
-	
-	/**
 	 * Return the item name for the ebus id
 	 * @param id The ebus id (see ebus-configuration.json)
 	 * @return The openhab item names

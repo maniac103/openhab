@@ -6,7 +6,7 @@
         "class":    "heating",
         "command":  "50 23",
         "data":     "00 74 27 00 00 5D 01 00 00",
-        "dst":      "30",
+        "dst":      "35",
 
         "values": {
             "_crc":            {"type": "crc-kw", "pos": 6},
@@ -22,7 +22,7 @@
         "class":    "heating",
         "command":  "50 22",
         "data":     "(FF) 74 27",
-        "dst":      "30",
+        "dst":      "35",
 
         "values": {
             "program_heating": {"type": "byte", "pos": 12, "label": "Heating program", "min": 0, "max": 3,
@@ -37,7 +37,7 @@
         "class":    "dhw",
         "command":  "50 23",
         "data":     "00 75 27 00 00 5D 01 00 00",
-        "dst":      "30",
+        "dst":      "35",
 
         "values": {
             "_crc":        {"type": "crc-kw", "pos": 6},
@@ -53,7 +53,7 @@
         "class":    "dhw",
         "command":  "50 22",
         "data":     "(A3) 75 27",
-        "dst":      "30",
+        "dst":      "35",
 
         "values": {
             "program_dhw": {"type": "byte", "pos": 12, "label": "DHW program", "min": 0, "max": 2,
