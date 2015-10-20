@@ -1,4 +1,4 @@
-# JSON configuration for _vaillant-vrc470_
+# JSON configuration for __vaillant-vrc470_
 
 ID                                 | Command                            | Item type | Description                                                                                                                                                                          
 ---                                | ---                                | ---       | ---                                                                                                                                                                                  
@@ -18,3 +18,4 @@ vrc470.outsidetemp.outsidetemp     | vrc470.outsidetemp                 | Number
 vrc470.outsidetemp.outsidetemp_s   | vrc470.outsidetemp                 | Number    | Outside temperature status (0=ok;85=circuit;170=cutoff)                                                                                                                              
 vrc470.roomtemp.roomtemp           | vrc470.roomtemp                    | Number    | Room temperature                                                                                                                                                                     
 vrc470.roomtemp.roomtemp_s         | vrc470.roomtemp                    | Number    | Room temperature status (0=ok;85=circuit;170=cutoff)                                                                                                                                 
+vrc470.set_hc1opmode               | vrc470.set_hc1opmode               | Number    | HC1 Operation mode (0 = off, 1 = manual, 2 = auto, 3 = on, 4 = night, 5 = summer)                                                                                                    

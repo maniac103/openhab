@@ -1,4 +1,4 @@
-# JSON configuration for _vaillant-bai00_
+# JSON configuration for __vaillant-bai00_
 
 ID                                | Command                     | Item type | Description                                                
 ---                               | ---                         | ---       | ---                                                        

@@ -50,22 +50,24 @@ For your convenience you can see the relevant section as follows:
     #
     # >> Deprecated
     #
-    # >> vaillant - All older vaillant telegrams (will be merged in other files)
-    # >> wolf-35 - All older Wolf eBUS dst address 0x35 telegrams (will be merged in other files)
+    # >> _vaillant - All older vaillant telegrams (will be merged in other files)
+    # >> _wolf-35 - All older Wolf eBUS dst address 0x35 telegrams (will be merged in other files)
     #
-    # >> Testing
+    # >> Testing/Unstable
     #
-    # >> testing - All unknown or test telegrams (for developers only)
-    # >> wolf-test - All Wolf unknown or test telegrams (for developers only)
+    # >> _testing - All unknown or test telegrams (for developers only)
+    # >> _wolf-test - All Wolf unknown or test telegrams (for developers only)
+    # >> _vaillant-bai00 - All Vaillant BAI000 telegrams
+    # >> _vaillant-vrc470 - All Vaillant VRC470 telegrams
     #
     # >> Productive
     #
-    # >> vaillant-bai00 - All Vaillant BAI000 telegrams
-    # >> vaillant-vrc470 - All Vaillant VRC470 telegrams
-    # >> wolf-cgb2 - All boiler Wolf CGB2 telegrams
+    # >> common -  Commands from eBUS standard
     # >> wolf-cgb2_hc - All boiler Wolf CGB2 heating curve  telegrams
+    # >> wolf-cgb2 - All boiler Wolf CGB2 telegrams
     # >> wolf-sm1 - All Wolf Solar Module SM1 telegrams
     # >> custom - Use configuration defined by ebus:parserUrl
+    #
     # default uses common and all vendor specified telegrams
     #ebus:parsers=common,wolf,testing,custom
 
@@ -105,13 +107,14 @@ ID Part             | Description
 
 #### List of ID's
 
-ID's                                                    | Description
----                                                     | ---
-[Vaillant BAI00](./docs/json-files/vaillant-bai00.md)   | Vaillant BAI00
-[Vaillant VRC470](./docs/json-files/vaillant-vrc470.md) | Vaillant VRC470 controller
-[Wolf CGB2](./docs/json-files/wolf-cgb2.md)             | Wolf CGB2 Boiler, used in Heating system Wolf CSZ-2
-[Wolf CGB2 HC](./docs/json-files/wolf-cgb2_hc.md)       | Wolf CGB2 Boiler (Heating Curve), used in Heating system Wolf CSZ-2
-[Wolf SM1](./docs/json-files/wolf-sm1.md)               | Wolf Solar Module, used in Heating system Wolf CSZ-2
+ID's                                                     | Description
+---                                                      | ---
+[Vaillant BAI00](./docs/json-files/_vaillant-bai00.md)   | (Testing/Unstable) Vaillant BAI00
+[Vaillant VRC470](./docs/json-files/_vaillant-vrc470.md) | (Testing/Unstable) Vaillant VRC470 controller
+[Common](./docs/json-files/common1.md)                   | Standard eBUS commands, Vendor independend
+[Wolf CGB2](./docs/json-files/wolf-cgb2.md)              | Wolf CGB2 Boiler, used in Heating system Wolf CSZ-2
+[Wolf CGB2 HC](./docs/json-files/wolf-cgb2_hc.md)        | Wolf CGB2 Boiler (Heating Curve), used in Heating system Wolf CSZ-2
+[Wolf SM1](./docs/json-files/wolf-sm1.md)                | Wolf Solar Module, used in Heating system Wolf CSZ-2
 
 You can find a complete list of all supported devices [here](./docs/json-configs.md).
 

@@ -1,4 +1,4 @@
-# JSON configuration for _wolf-test_
+# JSON configuration for __wolf-test_
 
 ID                                   | Command                              | Item type | Description                                                          
 ---                                  | ---                                  | ---       | ---                                                                  

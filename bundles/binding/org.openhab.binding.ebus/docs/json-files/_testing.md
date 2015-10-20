@@ -1,4 +1,4 @@
-# JSON configuration for _testing_
+# JSON configuration for __testing_
 
 ID                          | Command                 | Item type | Description
 ---                         | ---                     | ---       | ---        

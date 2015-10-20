@@ -3,14 +3,14 @@
 This is an automatic created list of all included configuration files.
 
 * [common](./json-files/common.md)
-* [testing](./json-files/testing.md)
-* [vaillant-bai00](./json-files/vaillant-bai00.md)
-* [vaillant](./json-files/vaillant.md)
-* [vaillant-vrc470](./json-files/vaillant-vrc470.md)
-* [wolf-35](./json-files/wolf-35.md)
 * [wolf-cgb2](./json-files/wolf-cgb2.md)
 * [wolf-cgb2_hc](./json-files/wolf-cgb2_hc.md)
-* [wolf](./json-files/wolf.md)
 * [wolf-sm1](./json-files/wolf-sm1.md)
-* [wolf-test](./json-files/wolf-test.md)
+* [_testing](./json-files/_testing.md)
+* [_vaillant-bai00](./json-files/_vaillant-bai00.md)
+* [_vaillant](./json-files/_vaillant.md)
+* [_vaillant-vrc470](./json-files/_vaillant-vrc470.md)
+* [_wolf-35](./json-files/_wolf-35.md)
+* [_wolf](./json-files/_wolf.md)
+* [_wolf-test](./json-files/_wolf-test.md)
 
