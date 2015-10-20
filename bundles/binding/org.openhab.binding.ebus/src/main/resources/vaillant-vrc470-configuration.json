@@ -1,0 +1,47 @@
+[
+    {
+        "comment":  "<Controller> Outside temperature (°C)",
+        "device":   "Vaillant VRC 470",
+        "id":       "temp_outside",
+        "class":    "controller",
+        "command":  "B5 09",
+        "data":     "0D 62 00",
+        "dst":      "15",
+		
+        "values": {
+	        "temp_outside": {"type": "data2c", "pos": 12, "label": "Outside temperature"},
+			"status":       {"type": "uchar", "pos": 14, "label": "Outside temperature status",
+				"mapping":  {"0":"ok", "85":"circuit", "170":"cutoff"}}
+        }
+    },
+
+	{
+		"comment":	"<Heating> HC1 Operation mode",
+		"device":   "Vaillant VRC 470",
+		"id":		"heating_circuit_program",
+		"class":	"heating",
+		"command":	"B5 09",
+		"data": 	"0D 2F 00",
+		"dst":		"15",
+		
+		"values": {
+			"program": {"type": "uchar", "pos": 12, "label": "HC1 Operation mode",
+				"mapping": {"0":"off", "1":"manual", "2":"auto", "3":"on", "4":"night", "5":"summer"}}
+		}
+	},
+	
+	{
+		"comment":	"<Heating> Set HC1 Operation mode",
+		"device":   "Vaillant VRC 470",
+		"id":		"set_heating_circuit_program",
+		"class":	"heating",
+		"command":	"B5 09",
+		"data": 	"0E 2F 00 00",
+		"dst":		"15",
+		
+		"values": {
+			"program": {"type": "uchar", "pos": 9, "label": "HC1 Operation",
+				"mapping": {"0":"off", "1":"manual", "2":"auto", "3":"on", "4":"night", "5":"summer"}}
+		}
+	}
+]
