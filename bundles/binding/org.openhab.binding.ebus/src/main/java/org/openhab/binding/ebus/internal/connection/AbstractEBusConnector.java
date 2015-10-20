@@ -179,7 +179,11 @@ public abstract class AbstractEBusConnector extends Thread {
 
 							// check if the buffer is empty and ready for
 							// sending data
-							onEBusSyncReceived(bufferSize==0);
+							try {
+								onEBusSyncReceived(bufferSize==0);
+							} catch (Exception e) {
+								logger.error("Error while processing event sync received!", e);
+							}
 						}
 					}
 				}

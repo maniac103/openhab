@@ -116,7 +116,18 @@ public class AbstractEBusWriteConnector extends AbstractEBusConnector {
 		// replace crc with calculated value
 		data[data.length-1] = crc;
 
-		return outputQueue.add(new QueueEntry(data));
+		boolean result = false;
+		
+		try {
+			result = outputQueue.add(new QueueEntry(data));
+		} catch (IllegalStateException e) {
+			logger.error("Send queue is full! The eBUS service will reset the queue to ensure proper operation.");
+			
+			outputQueue.clear();
+			result = outputQueue.add(new QueueEntry(data));
+		}
+		
+		return result;
 	}
 
 	private void checkSendStatus() {
@@ -352,7 +363,7 @@ public class AbstractEBusWriteConnector extends AbstractEBusConnector {
 						return;
 
 				} else if(ack == EBusTelegram.SYN) {
-					logger.debug("No answer from slave, skip ...");
+					logger.debug("No answer from slave for telegram: {}", EBusUtils.toHexDumpString(sendBuffer));
 
 					// clear uncompleted telegram or it will result
 					// in uncomplete but valid telegram!
