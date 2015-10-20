@@ -524,6 +524,18 @@
 			<version>${project.version}</version>
 			<type>jar</type>
 		</dependency>
+		<dependency>
+			<groupId>org.openhab.action</groupId>
+			<artifactId>org.openhab.action.ecobee</artifactId>
+			<version>${project.version}</version>
+			<type>jar</type>
+		</dependency>
+		<dependency>
+			<groupId>org.openhab.action</groupId>
+			<artifactId>org.openhab.action.dscalarm</artifactId>
+			<version>${project.version}</version>
+			<type>jar</type>
+		</dependency>
 		
 		<dependency>
 			<groupId>org.openhab.binding</groupId>
@@ -1278,6 +1290,12 @@
         <dependency>
             <groupId>org.openhab.binding</groupId>
             <artifactId>org.openhab.binding.souliss</artifactId>
+            <version>${project.version}</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.openhab.binding</groupId>
+            <artifactId>org.openhab.binding.sagercaster</artifactId>
             <version>${project.version}</version>
             <type>jar</type>
         </dependency>
