@@ -483,6 +483,14 @@
 		</Product>
 		<Product>
 			<Reference>
+				<Type>5256</Type>
+				<Id>3133</Id>
+			</Reference>
+			<Model>LFM-20</Model>
+			<Label lang="en">Isolated Contact Fixture Module</Label>
+		</Product>
+		<Product>
+			<Reference>
 				<Type>4457</Type>
 				<Id>3034</Id>
 			</Reference>
@@ -650,9 +658,9 @@
 				<Type>2001</Type>
 				<Id>0000</Id>
 			</Reference>
-			<Model>054313</Model>
-			<Label lang="en">Single button wall switch</Label>
-			<Label lang="de">Wandschalter</Label>
+			<Model>ZME_054313Z</Model>
+			<Label lang="en">Duewi ZW BJ ES 1000 / Reitz 054313 / ZWave.me 05457 Single button wall switch</Label>
+			<Label lang="de">Duewi ZW BJ ES 1000 / Reitz 054313 / ZWave.me 05457 Wandeinbautaster einfach</Label>
 			<ConfigFile>reitz/054313.xml</ConfigFile>
 		</Product>
 	</Manufacturer>
@@ -1026,6 +1034,10 @@
 				<Id>0058</Id>
 			</Reference>
 			<Reference>
+				<Type>0101</Type>
+				<Id>0058</Id>
+			</Reference>
+			<Reference>
 				<Type>0201</Type>
 				<Id>0058</Id>
 			</Reference>
@@ -1292,7 +1304,8 @@
 			</Reference>
 			<Model>ZM1602</Model>
 			<Label lang="en">AC/DC Siren</Label>
-			<ConfigFile>vision/zm1602.xml</ConfigFile>
+			<ConfigFile VersionMin="1" VersionMax="15.2">vision/zm1602.xml</ConfigFile>
+			<ConfigFile VersionMax="15.3">vision/zm1602v4.xml</ConfigFile> 
 		</Product>
 		<Product>
 			<Reference>
@@ -1387,8 +1400,7 @@
 			<Model>FGD211</Model>
 			<Label lang="en">Universal Dimmer 500W</Label>
 			<ConfigFile VersionMax="1.8">fibaro/fgd211-14.xml</ConfigFile> <!-- VersionMin="1.4" -->
-			<ConfigFile VersionMin="1.9" VersionMax="1.11">fibaro/fgd211-19.xml
-			</ConfigFile>
+			<ConfigFile VersionMin="1.9" VersionMax="1.11">fibaro/fgd211-19.xml</ConfigFile>
 			<ConfigFile VersionMin="2.1">fibaro/fgd211-21.xml</ConfigFile> <!-- VersionMax="2.3" -->
 		</Product>
 		<Product>
@@ -1512,6 +1524,10 @@
 			<Reference>
 				<Type>0B00</Type>
 				<Id>1001</Id>
+			</Reference>
+			<Reference>
+				<Type>0B00</Type>
+				<Id>2001</Id>
 			</Reference>
 			<Reference>
 				<Type>0B00</Type>
@@ -1847,7 +1863,7 @@
 				<Type>0121</Type>
 				<Id>0133</Id>
 			</Reference>
-			<Model>TZ68</Model>
+			<Model>TZ78</Model>
 			<Label lang="en">In Wall Micro Switch</Label>
 			<ConfigFile>tkb/tz78.xml</ConfigFile>
 		</Product>
@@ -2146,6 +2162,15 @@
             <Label lang="en">20A Tamper Resistant Duplex Receptacle</Label>
             <ConfigFile>enerwave/zw20r.xml</ConfigFile>
         </Product>
+        <Product>
+            <Reference>
+                <Type>0601</Type>
+                <Id>0901</Id>
+            </Reference>
+            <Model>ZWN-BPC</Model>
+            <Label lang="en">PIR Sensor</Label>
+            <ConfigFile>enerwave/zwn-bpc.xml</ConfigFile>
+        </Product>
     </Manufacturer>
 	<Manufacturer>
 		<Id>0001</Id>
@@ -2370,6 +2395,10 @@
 				<Type>3</Type>
 				<Id>2</Id>
 			</Reference>
+			<Reference>
+				<Type>3</Type>
+				<Id>52</Id>
+			</Reference>
 			<Model>ZMNHCD</Model>
 			<Label lang="en">Flush Shutter</Label>
 			<ConfigFile>qubino/zmnhcd.xml</ConfigFile>
@@ -2382,6 +2411,15 @@
 			<Model>ZMNHOD</Model>
 			<Label lang="en">Flush Shutter</Label>
 			<ConfigFile>qubino/zmnhod.xml</ConfigFile>
+		</Product>
+		<Product>
+			<Reference>
+				<Type>2</Type>
+				<Id>51</Id>
+			</Reference>
+			<Model>ZMNHBD</Model>
+			<Label lang="en">Flush 2 relays</Label>
+			<ConfigFile>qubino/zmnhbd.xml</ConfigFile>
 		</Product>
 	</Manufacturer>
 	<Manufacturer>
@@ -2422,6 +2460,10 @@
 			<Reference>
 				<Type>453</Type>
 				<Id>10E</Id>
+			</Reference>
+			<Reference>
+				<Type>453</Type>
+				<Id>10F</Id>
 			</Reference>
 			<Reference>
 				<Type>453</Type>
@@ -2470,13 +2512,31 @@
 		<Name>BeNext</Name>
 		<Product>
 			<Reference>
+				<Type>0004</Type>
+				<Id>0101</Id>
+			</Reference>
+			<Model>doorSensor</Model>
+			<Label lang="en">BeNext Door Sensor</Label>
+			<ConfigFile>benext/doorsensor.xml</ConfigFile>
+		</Product>
+		<Product>
+			<Reference>
+				<Type>0008</Type>
+				<Id>0101</Id>
+			</Reference>
+			<Model>powerSwitch</Model>
+			<Label lang="en">BeNext Power Switch EU</Label>
+			<ConfigFile>benext/switch.xml</ConfigFile>
+		</Product>
+		<Product>
+			<Reference>
 				<Type>000d</Type>
 				<Id>0100</Id>
 			</Reference>
 			<Model>builtInDimmer</Model>
 			<Label lang="en">BeNext Built-in Dimmer</Label>
 			<ConfigFile>benext/builtindimmer.xml</ConfigFile>
-		</Product>
+		</Product>		
 		<Product>
 			<Reference>
 				<Type>0018</Type>
@@ -2733,6 +2793,31 @@
 			<Model>ARZ</Model>
 			<Label lang="en">Roller Shutter Module</Label>
 			<ConfigFile>fakro/arz.xml</ConfigFile>
+		</Product>
+	</Manufacturer>
+	<Manufacturer>
+		<Id>0157</Id>
+		<Name>EcoNet Controls</Name>
+		<Product>
+			<Reference>
+				<Type>0101</Type>
+				<Id>0101</Id>
+			</Reference>
+			<Model>EV-100</Model>
+			<Label lang="en">Vent</Label>
+		</Product>
+	</Manufacturer>
+	<Manufacturer>
+		<Id>0165</Id>
+		<Name>Nodon</Name>
+		<Product>
+			<Reference>
+				<Type>0002</Type>
+				<Id>0001</Id>
+			</Reference>
+			<Model>CRC-3100</Model>
+			<Label lang="en">Remote Control</Label>
+			<ConfigFile>nodon/crc3100.xml</ConfigFile>
 		</Product>
 	</Manufacturer>
 </Manufacturers>

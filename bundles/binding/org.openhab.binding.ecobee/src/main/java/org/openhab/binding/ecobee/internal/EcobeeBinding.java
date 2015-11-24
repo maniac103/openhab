@@ -414,7 +414,7 @@ public class EcobeeBinding extends AbstractActiveBinding<EcobeeBindingProvider> 
 			try {
 				return createState(thermostat.getProperty(property));
 			} catch (Exception e) {
-				logger.error("Unable to get state from thermostat", e);
+				logger.debug("Unable to get state from thermostat", e);
 			}
 		}
 		return UnDefType.NULL;
@@ -659,8 +659,11 @@ public class EcobeeBinding extends AbstractActiveBinding<EcobeeBindingProvider> 
 		// different thermostats or properties than before.
 		if (provider instanceof EcobeeBindingProvider) {
 			String userid = ((EcobeeBindingProvider) provider).getUserid(itemName);
-			getOAuthCredentials(userid).getLastRevisionMap().clear();
+			if (userid != null) {
+				getOAuthCredentials(userid).getLastRevisionMap().clear();
+			}
 		}
+		super.bindingChanged(provider, itemName);
 	}
 
 	/**
@@ -675,6 +678,7 @@ public class EcobeeBinding extends AbstractActiveBinding<EcobeeBindingProvider> 
 				getOAuthCredentials(userid).getLastRevisionMap().clear();
 			}
 		}
+		super.allBindingsChanged(provider);
 	}
 
 	/**
@@ -864,7 +868,7 @@ public class EcobeeBinding extends AbstractActiveBinding<EcobeeBindingProvider> 
 					selection.setIncludeManagement(true);
 				} else if (property.startsWith("weather")) {
 					selection.setIncludeWeather(true);
-				} else if (property.startsWith("events")) {
+				} else if (property.startsWith("events") || property.startsWith("runningEvent")) {
 					selection.setIncludeEvents(true);
 				} else if (property.startsWith("program")) {
 					selection.setIncludeProgram(true);
