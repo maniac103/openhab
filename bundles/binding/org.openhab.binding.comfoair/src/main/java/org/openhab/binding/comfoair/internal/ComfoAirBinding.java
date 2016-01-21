@@ -13,6 +13,9 @@ import java.util.Dictionary;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang.StringUtils;
 import org.openhab.binding.comfoair.ComfoAirBindingProvider;
@@ -38,7 +41,7 @@ import org.slf4j.LoggerFactory;
 public class ComfoAirBinding extends AbstractActiveBinding<ComfoAirBindingProvider> implements ManagedService {
 
 	static final Logger logger = LoggerFactory.getLogger(ComfoAirBinding.class);
-	
+
 	/**
 	 * The interval to find new refresh candidates (defaults to 60000
 	 * milliseconds).
@@ -47,12 +50,14 @@ public class ComfoAirBinding extends AbstractActiveBinding<ComfoAirBindingProvid
 	private String port;
 
 	private ComfoAirConnector connector;
-	
-	
+
+	private ScheduledExecutorService scheduler;
+
 	/**
 	 * @{inheritDoc
 	 */
 	public void activate() {
+		scheduler = Executors.newScheduledThreadPool(10);
 	}
 
 	/**
@@ -63,13 +68,22 @@ public class ComfoAirBinding extends AbstractActiveBinding<ComfoAirBindingProvid
 			provider.removeBindingChangeListener(this);
 		}
 
+		if(scheduler != null) {
+			scheduler.shutdown();
+			try {
+				scheduler.awaitTermination(5000, TimeUnit.SECONDS);
+			} catch (InterruptedException e) {
+				logger.warn("Unable to shutdown scheduler!");
+			}
+		}
+		
 		providers.clear();
 
 		if (connector != null) {
 			connector.close();
 		}
 	}
-	
+
 	/**
 	 * @{inheritDoc
 	 */
@@ -100,17 +114,17 @@ public class ComfoAirBinding extends AbstractActiveBinding<ComfoAirBindingProvid
 		for (ComfoAirBindingProvider provider : providers) {
 			String eventType = provider.getConfiguredKeyForItem(itemName);
 			ComfoAirCommand changeCommand = 
-				ComfoAirCommandType.getChangeCommand(eventType, (DecimalType) command);
+					ComfoAirCommandType.getChangeCommand(eventType, (DecimalType) command);
 
 			sendCommand(changeCommand);
 
 			Collection<ComfoAirCommand> affectedReadCommands = 
-				ComfoAirCommandType.getAffectedReadCommands(eventType, usedKeys);
+					ComfoAirCommandType.getAffectedReadCommands(eventType, usedKeys);
 
 			if (affectedReadCommands.size() > 0) {
 				// refresh 3 seconds later all affected items
-				Thread updateThread = new AffectedItemsUpdateThread(affectedReadCommands);
-				updateThread.start();
+				Runnable updateThread = new AffectedItemsUpdateThread(affectedReadCommands);
+				scheduler.schedule(updateThread, 3, TimeUnit.SECONDS);
 			}
 		}
 	}
@@ -122,7 +136,7 @@ public class ComfoAirBinding extends AbstractActiveBinding<ComfoAirBindingProvid
 	public void execute() {
 		for (ComfoAirBindingProvider provider : providers) {
 			Collection<ComfoAirCommand> commands = 
-				ComfoAirCommandType.getReadCommandsByEventTypes(provider.getConfiguredKeys());
+					ComfoAirCommandType.getReadCommandsByEventTypes(provider.getConfiguredKeys());
 
 			for (ComfoAirCommand command : commands) {
 				sendCommand(command);
@@ -137,7 +151,7 @@ public class ComfoAirBinding extends AbstractActiveBinding<ComfoAirBindingProvid
 	 * @param command
 	 */
 	private void sendCommand(ComfoAirCommand command) {
-		
+
 		int[] response = connector.sendCommand(command);
 
 		if (response == null) {
@@ -145,7 +159,7 @@ public class ComfoAirBinding extends AbstractActiveBinding<ComfoAirBindingProvid
 		}
 
 		List<ComfoAirCommandType> commandTypes = 
-			ComfoAirCommandType.getCommandTypesByReplyCmd(command.getReplyCmd());
+				ComfoAirCommandType.getCommandTypesByReplyCmd(command.getReplyCmd());
 
 		for (ComfoAirCommandType commandType : commandTypes) {
 			ComfoAirDataType dataType = commandType.getDataType();
@@ -197,8 +211,8 @@ public class ComfoAirBinding extends AbstractActiveBinding<ComfoAirBindingProvid
 		}
 	}
 
-	
-	private class AffectedItemsUpdateThread extends Thread {
+
+	private class AffectedItemsUpdateThread implements Runnable {
 
 		private Collection<ComfoAirCommand> affectedReadCommands;
 
@@ -207,15 +221,10 @@ public class ComfoAirBinding extends AbstractActiveBinding<ComfoAirBindingProvid
 		}
 
 		public void run() {
-			try {
-				sleep(3000);
-				for (ComfoAirCommand readCommand : this.affectedReadCommands) {
-					sendCommand(readCommand);
-				}
-			} catch (InterruptedException e) {
-				// nothing to do ...
+			for (ComfoAirCommand readCommand : this.affectedReadCommands) {
+				sendCommand(readCommand);
 			}
 		}
 	}
-	
+
 }

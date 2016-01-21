@@ -12,6 +12,8 @@ import gnu.io.CommPortIdentifier;
 import gnu.io.NoSuchPortException;
 import gnu.io.PortInUseException;
 import gnu.io.SerialPort;
+import gnu.io.SerialPortEvent;
+import gnu.io.SerialPortEventListener;
 import gnu.io.UnsupportedCommOperationException;
 
 import java.io.BufferedInputStream;
@@ -20,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Enumeration;
+import java.util.TooManyListenersException;
 
 import org.apache.commons.io.IOUtils;
 import org.openhab.binding.comfoair.internal.InitializationException;
@@ -73,6 +76,14 @@ public class ComfoAirConnector {
 				serialPort.setSerialPortParams(9600, SerialPort.DATABITS_8,
 						SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
 
+				serialPort.enableReceiveThreshold(1);
+				serialPort.enableReceiveTimeout(1000);
+				
+				// RXTX serial port library causes high CPU load
+				// Start event listener, which will just sleep and slow down event loop
+				serialPort.addEventListener(new CPUWorkaroundThread());
+				serialPort.notifyOnDataAvailable(true);
+				
 				inputStream = new DataInputStream(new BufferedInputStream(
 						serialPort.getInputStream()));
 				outputStream = serialPort.getOutputStream();
@@ -86,10 +97,13 @@ public class ComfoAirConnector {
 				throw new InitializationException(e);
 			} catch (IOException e) {
 				throw new InitializationException(e);
+			} catch (TooManyListenersException e) {
+				throw new InitializationException(e);
 			}
 
 		} catch (NoSuchPortException e) {
 			StringBuilder sb = new StringBuilder();
+			@SuppressWarnings("rawtypes")
 			Enumeration portList = CommPortIdentifier.getPortIdentifiers();
 			while (portList.hasMoreElements()) {
 				CommPortIdentifier id = (CommPortIdentifier) portList
@@ -413,7 +427,7 @@ public class ComfoAirConnector {
 
 		try {
 			outputStream.write(request);
-			outputStream.flush();
+			// remove outputStream.flush(), can hang forever
 
 			return true;
 
@@ -446,5 +460,16 @@ public class ComfoAirConnector {
 			sb.append(String.format(" %02x", ch));
 		}
 		return sb.toString();
+	}
+	
+	private class CPUWorkaroundThread implements SerialPortEventListener {
+		@Override
+		public void serialEvent(SerialPortEvent event) {
+			try {
+				logger.trace("RXTX library CPU load workaround, sleep forever");
+				Thread.sleep(Long.MAX_VALUE);
+			} catch (InterruptedException e) {
+			}
+		}
 	}
 }
