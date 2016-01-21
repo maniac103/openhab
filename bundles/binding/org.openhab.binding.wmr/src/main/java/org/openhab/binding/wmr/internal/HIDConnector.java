@@ -204,10 +204,13 @@ public class HIDConnector extends Thread {
 		// start hid connection
 		try {
 			connect();
+			
+			hidDevice.disableBlocking();
+			
 		} catch (IOException e) {
 			logger.error("An IO exeption has occured while connecting!", e);
 		}
-
+		
 		while (!isInterrupted() && hidDevice != null) {
 
 			try {
@@ -215,9 +218,14 @@ public class HIDConnector extends Thread {
 				requestData();	
 
 				// read hid data
-				int responseBytes =	hidDevice.readTimeout(responseBuffer, 10 * 1000);
-
-				parseResponse(responseBytes, responseBuffer);
+				//int responseBytes =	hidDevice.readTimeout(responseBuffer, 10 * 1000);
+				int responseBytes =	hidDevice.read(responseBuffer);
+				if(responseBytes > 0) {
+					parseResponse(responseBytes, responseBuffer);
+				}
+				
+				Thread.sleep(100);
+				
 			} catch (Exception e) {
 				
 				if(hidDevice == null) {
