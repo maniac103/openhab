@@ -242,7 +242,7 @@ public class WmrUtils {
 		// sensor id
 		int sensor = toInt(data[2]) % 16;		
 		
-		// temperature (캜)
+		// temperature (째C)
 		float temperature = (256f * (toInt(data[4]) % 16) + toInt(data[3])) / 10f;
 		if(isNegative(toInt(data[4]) / 16)) {
 			temperature *= -1;
@@ -251,7 +251,7 @@ public class WmrUtils {
 		// humidity (%)
 		int humidity = toInt(data[5]) % 100;
 		
-		// dewpoint (캜)
+		// dewpoint (째C)
 		float dewpoint = (256f * (toInt(data[7]) % 16) + toInt(data[6])) / 10f;
 		if(isNegative(toInt(data[7]) / 16)) {
 			dewpoint *= -1;
@@ -266,6 +266,16 @@ public class WmrUtils {
 			no = "outdoor2";
 		} else if(sensor == 4) {
 			no = "outdoor3";
+		}else if(sensor == 5) {
+			no = "outdoor4";
+		}else if(sensor == 6) {
+			no = "outdoor5";
+		}else if(sensor == 7) {
+			no = "outdoor6";
+		}else if(sensor == 8) {
+			no = "outdoor7";
+		}else if(sensor == 9) {
+			no = "outdoor8";
 		}
 		
 		result.put("temp." + no + ".lowbatt", lowBattery);
@@ -275,9 +285,9 @@ public class WmrUtils {
 		
 		logger.trace("Low Battery: {}", lowBattery);
 		logger.trace("Sensor:      {}", sensor);
-		logger.trace("Temperature: {} 캜", temperature);
+		logger.trace("Temperature: {} 째C", temperature);
 		logger.trace("Humidity:    {} %", humidity);
-		logger.trace("Dew Point:   {} 캜", dewpoint);
+		logger.trace("Dew Point:   {} 째C", dewpoint);
 		
 		return result;
 	}
