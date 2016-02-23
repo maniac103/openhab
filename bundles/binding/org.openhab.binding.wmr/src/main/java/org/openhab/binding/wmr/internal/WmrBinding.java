@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.commons.lang.StringUtils;
 import org.openhab.binding.wmr.WmrBindingProvider;
 import org.openhab.core.binding.AbstractBinding;
 import org.openhab.core.types.State;
@@ -46,9 +47,15 @@ public class WmrBinding extends AbstractBinding<WmrBindingProvider> implements M
 		if(connector != null && connector.isAlive()) {
 			connector.interrupt();
 		}
-		
-		HIDConnector.loadHIDLibrary();
-		connector = new HIDConnector();
+
+		String hostAndPort = properties != null ? (String) properties.get("host") : null;
+		if (StringUtils.isNotBlank(hostAndPort)) {
+		    String[] splitted = hostAndPort.split(":");
+		    connector = new TCPConnector(splitted[0], Integer.parseInt(splitted[1]));
+		} else {
+		    HIDConnector.loadHIDLibrary();
+		    connector = new HIDConnector();
+		}
 		
 		// add event listener
 		connector.addListener(this);
